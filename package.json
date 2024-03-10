@@ -1,6 +1,6 @@
 {
   "name": "com.ae.blendity",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "displayName": "Blendity",
   "description": "Unity Asset for running Blender 3D processes/scripts from a context menu",
   "unity": "2019.1",

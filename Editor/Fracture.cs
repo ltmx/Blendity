@@ -28,6 +28,8 @@ namespace Blendity
       { "sharpEdges", "True", "bool" },
       { "margin", "0" , "float:0,1"},
       { "recenterOrigin", "True", "bool" },
+      { "Join All Objects", "False", "bool" },
+      { "Union Loose Parts", "True", "bool" },
     };
       modal.defaultVariables = defaultVariables;
       modal.OnStart = (List<KeyValueConfig> variables) =>
@@ -56,6 +58,7 @@ namespace Blendity
         AssetDatabase.Refresh();
         EditorUtility.ClearProgressBar();
       };
+      modal.titleContent = new GUIContent("Fracture Parameters");
       modal.ShowModalUtility();
     }
   }

@@ -77,7 +77,7 @@ namespace Blendity
       return assetPath;
     }
 
-    public static void ExtractTexturesAndMaterials(string assetPath)
+    public static void ExtractTexturesAndMaterials(string assetPath, bool searchAndRemap = false)
     {
       assetPath = GetImporterPath(assetPath);
 
@@ -86,9 +86,28 @@ namespace Blendity
       string[] outputFilePieces = assetPath.Split('/');
       string outputDir = string.Join("/", outputFilePieces.Take(outputFilePieces.Length - 1));
 
-      modelImporter.ExtractTextures(outputDir);
-      AssetDatabase.Refresh();
-      ExtractMaterialsFromAsset(assetImporter, outputDir);
+      try
+      {
+        if (searchAndRemap)
+        {
+          // modelImporter.materialLocation = ModelImporterMaterialLocation.External;
+          modelImporter.SearchAndRemapMaterials(ModelImporterMaterialName.BasedOnTextureName, ModelImporterMaterialSearch.Everywhere);
+          AssetDatabase.WriteImportSettingsIfDirty(assetImporter.assetPath);
+          AssetDatabase.ImportAsset(assetImporter.assetPath, ImportAssetOptions.ForceUpdate);
+        }
+        else
+        {
+          modelImporter.ExtractTextures(outputDir);
+          ExtractMaterialsFromAsset(assetImporter, outputDir);
+        }
+        AssetDatabase.Refresh();
+      }
+      catch (Exception e)
+      {
+        Debug.LogError($"An error when trying to extract textures and materials of the following asset: {outputDir}");
+        Debug.LogError(e);
+        EditorUtility.ClearProgressBar();
+      }
     }
 
     public static void SearchAndRemapMaterials(string assetPath)
@@ -109,6 +128,14 @@ namespace Blendity
 
         AssetDatabase.CreateAsset(mat, relativePath);
       }
+    }
+
+    [MenuItem("Assets/Blendity/Set Blender Path")]
+    public static void SetBlenderPath()
+    {
+      string folderPath = EditorUtility.OpenFilePanelWithFilters("Blender Executable", @"C:\Program Files\Blender Foundation",
+       new string[] { "Executable", "exe" });
+      EditorPrefs.SetString("blenderInstallationPath", folderPath);
     }
   }
 }

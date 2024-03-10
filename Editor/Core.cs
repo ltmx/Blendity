@@ -22,12 +22,15 @@ namespace Blendity
 
   public class Core : Editor
   {
-    private static string DefaultApp
+    public static string GetBlenderPath()
     {
-      get
+      string blenderPath = EditorPrefs.GetString("blenderInstallationPath");
+      if (blenderPath.Length == 0)
       {
-        return $@"""{Utils.GetPackagePath()}\blender~\blender.exe""";
+        Utils.SetBlenderPath();
+        blenderPath = EditorPrefs.GetString("blenderInstallationPath");
       }
+      return blenderPath;
     }
 
     public static CommandOutput RunCommand(
@@ -38,7 +41,9 @@ namespace Blendity
     )
     {
       if (appName == null)
-        appName = DefaultApp;
+      {
+        appName = GetBlenderPath();
+      }
 
       if (!isThreaded)
         EditorUtility.DisplayProgressBar("Executing Command", command, .25f);
@@ -53,6 +58,8 @@ namespace Blendity
             CreateNoWindow = true,
           };
 
+      procStartInfo.EnvironmentVariables["BLENDER_USER_CONFIG"] = $@"{Utils.GetPackagePath()}\blender~\2.92\Config\";
+      procStartInfo.EnvironmentVariables["BLENDER_USER_SCRIPTS"] = $@"{Utils.GetPackagePath()}\blender~\2.92\scripts";
       if (env != null)
         foreach (var variable in env)
           procStartInfo.EnvironmentVariables[variable.Key] = variable.Value;
@@ -96,7 +103,7 @@ namespace Blendity
       List<Task<CommandOutput>> tasks = new List<Task<CommandOutput>>();
 
       if (appName == null)
-        appName = DefaultApp;
+        appName = GetBlenderPath();
       for (int i = 0; i < selectedFileNames.Count; i++)
       {
         string fileName = selectedFileNames[i];
@@ -123,7 +130,7 @@ namespace Blendity
       path = Utils.GetWindowsPath(path);
 
       if (appName == null)
-        appName = DefaultApp;
+        appName = GetBlenderPath();
       for (int i = 0; i < n; i++)
       {
         tasks.Add(Task.Run(

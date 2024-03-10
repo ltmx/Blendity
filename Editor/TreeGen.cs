@@ -71,7 +71,7 @@ namespace Blendity
         Utils.CreateMaterial(barkMaterial);
         string leavesMaterial = materialDir + @"\leaves material.mat";
         Utils.CreateMaterial(leavesMaterial);
-        
+
         procOutputs.ForEach((procOutput) =>
         {
           UnityEngine.Debug.Log(procOutput);
@@ -83,6 +83,7 @@ namespace Blendity
         });
         EditorUtility.ClearProgressBar();
       };
+      modal.titleContent = new GUIContent("Tree Generator Parameters");
       modal.ShowModalUtility();
     }
   }

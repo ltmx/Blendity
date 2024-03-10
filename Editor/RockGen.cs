@@ -35,13 +35,10 @@ namespace Blendity
       {
         EditorUtility.DisplayProgressBar("Creating Rocks !", "Generating Rocks", .1f);
 
-        int numOfRocks = int.Parse(variables[0].value);
-        variables.RemoveAt(0);
-
         Func<string, int, Dictionary<string, string>> EnvCreator = (string path, int threadSeed) =>
         {
           int seed = Mathf.Abs((int)Stopwatch.GetTimestamp() + threadSeed) % 1048576;
-          string rockName = $"{variables[0].value}_{seed}";
+          string rockName = $"{variables[1].value}_{seed}";
           string output = $@"{path}\{rockName}.fbx";
           Dictionary<string, string> envVars = new Dictionary<string, string>{
             {"seed",$"{seed}"},
@@ -53,7 +50,7 @@ namespace Blendity
 
         List<CommandOutput> procOutputs = Core.RunCommandTimesN(
           $@"-b -P py_scripts~\generate_rock.py",
-          numOfRocks,
+          1,
           EnvCreator
         );
         EditorUtility.DisplayProgressBar("Creating Rocks !", "Importing Models", .7f);
@@ -63,6 +60,7 @@ namespace Blendity
 
         EditorUtility.ClearProgressBar();
       };
+      modal.titleContent = new GUIContent("Rock Generator Parameters");
       modal.ShowModalUtility();
     }
   }

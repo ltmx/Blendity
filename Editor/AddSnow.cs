@@ -19,9 +19,12 @@ namespace Blendity
     {
       ParamsModal modal = ScriptableObject.CreateInstance<ParamsModal>();
       string[,] defaultVariables = {
-        { "coverage %", "60", "int:0,100" },
-        { "height", "0.2", "float:0,1" },
-        { "mesh reduction", "0.8", "float:0,1" },
+        { "Coverage %", "60", "int:0,100" },
+        { "Height", "0.2", "float:0,1" },
+        { "Mesh Reduction", "0.8", "float:0,1" },
+        { "Rotate X", "0", "float:0,360" },
+        { "Rotate Y", "0", "float:0,360" },
+        { "Rotate Z", "0", "float:0,360" }
         };
       modal.defaultVariables = defaultVariables;
       modal.OnStart = (List<KeyValueConfig> variables) =>
@@ -50,6 +53,7 @@ namespace Blendity
         AssetDatabase.Refresh();
         EditorUtility.ClearProgressBar();
       };
+      modal.titleContent = new GUIContent("Snow Parameters");
       modal.ShowModalUtility();
     }
   }

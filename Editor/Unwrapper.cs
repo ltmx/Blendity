@@ -48,6 +48,7 @@ namespace Blendity
         AssetDatabase.Refresh();
         EditorUtility.ClearProgressBar();
       };
+      modal.titleContent = new GUIContent("Unwrapper Parameters");
       modal.ShowModalUtility();
     }
   }

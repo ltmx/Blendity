@@ -18,6 +18,9 @@ namespace Blendity
     private string newVariableKey = "";
     public string[,] defaultVariables;
     public bool canAddCustomVariables = false;
+
+    public delegate void OtherUIElements();
+    public OtherUIElements otherUIElements;
     private List<KeyValueConfig> variables;
     private ReorderableList list;
 
@@ -41,7 +44,42 @@ namespace Blendity
           EditorGUIUtility.labelWidth = 200f;
           KeyValueConfig item = variables[index];
 
-          if (item.config.StartsWith("float"))
+          if (item.config.StartsWith("range"))
+          {
+            string[] minMax = GetMinMax(item.config);
+            float minValue = int.Parse(minMax[0]);
+            float maxValue = int.Parse(minMax[1]);
+            float currentValueMin = float.Parse(item.value.Split(',')[0]);
+            float currentValueMax = float.Parse(item.value.Split(',')[1]);
+            EditorGUI.BeginChangeCheck();
+            EditorGUI.MinMaxSlider(
+                new Rect(rect.x, rect.y, rect.width - 60, EditorGUIUtility.singleLineHeight),
+                item.key,
+                ref currentValueMin,
+                ref currentValueMax,
+                minValue,
+                maxValue
+            );
+            GUIStyle rightAlignedStyle = new GUIStyle(GUI.skin.label)
+            {
+              alignment = TextAnchor.MiddleCenter
+            };
+
+            EditorGUI.LabelField(new Rect(rect.x + rect.width - 55, rect.y, 60, EditorGUIUtility.singleLineHeight),
+                    $"{currentValueMin}-{currentValueMax}", rightAlignedStyle);
+
+            if (EditorGUI.EndChangeCheck())
+            {
+              if (item.config.StartsWith("rangeInt"))
+                item.value = $"{(int)currentValueMin},{(int)currentValueMax}";
+              else if (item.config.StartsWith("rangeFloat"))
+              {
+                int decimalPoints = 1;
+                item.value = $"{currentValueMin.ToString("F" + decimalPoints)},{currentValueMax.ToString("F" + decimalPoints)}";
+              }
+            }
+          }
+          else if (item.config.StartsWith("float"))
           {
             string[] minMax = GetMinMax(item.config);
             item.value = "" + EditorGUI.Slider(
@@ -102,9 +140,11 @@ namespace Blendity
       if (list == null)
       {
         InitializeList();
-        position = new Rect(Event.current.mousePosition - new Vector2(200, 200), new Vector2(400, 400));
+        position = new Rect(Event.current.mousePosition - new Vector2(200, 200), new Vector2(400, position.height));
       }
       GUILayout.BeginVertical(GUILayout.MinHeight(position.height - EditorGUIUtility.singleLineHeight * 3));
+      if (otherUIElements != null)
+        otherUIElements();
       list.DoLayoutList();
       GUILayout.EndVertical();
 

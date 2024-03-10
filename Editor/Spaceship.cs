@@ -9,14 +9,14 @@ namespace Blendity
 {
   public class Spaceship : Editor
   {
-    [MenuItem("Assets/Blendity/Generate/Spaceships", true)]
+    [MenuItem("Assets/Blendity/Generate/Spaceships (Blender ≤ V3)", true)]
     public static bool GenerateSpaceshipValid()
     {
       string activeName = Utils.GetActiveFileName();
       return !activeName.EndsWith("Assets") && Directory.Exists(activeName);
     }
 
-    [MenuItem("Assets/Blendity/Generate/Spaceships")]
+    [MenuItem("Assets/Blendity/Generate/Spaceships (Blender ≤ V3)")]
     public static void GenerateSpaceship()
     {
       ParamsModal modal = ScriptableObject.CreateInstance<ParamsModal>();
@@ -30,8 +30,9 @@ namespace Blendity
         { "create_face_detail", "True","bool" },
         { "allow_horizontal_symmetry", "False","bool" },
         { "allow_vertical_symmetry", "False","bool" },
-        { "apply_bevel_modifier", "True","bool" },
-        { "assign_materials", "True","bool" },
+        { "add_bevel_modifier", "True","bool" },
+        { "create_materials", "True","bool" },
+        { "Union Loose Parts", "False","bool" },
       };
       modal.defaultVariables = defaultVariables;
       modal.OnStart = (List<KeyValueConfig> variables) =>
@@ -75,6 +76,16 @@ namespace Blendity
 
         AssetDatabase.Refresh();
         EditorUtility.ClearProgressBar();
+      };
+      modal.titleContent = new GUIContent("Spaceship Parameters (Works on Blender V3 or older)");
+      modal.otherUIElements = () =>
+      {
+        GUILayout.Label("Credit goes to Lawrence D'Oliveiro");
+
+        if (GUILayout.Button("Check Github website"))
+        {
+          Application.OpenURL("https://github.com/ldo/blender_spaceship_generator");
+        }
       };
       modal.ShowModalUtility();
     }

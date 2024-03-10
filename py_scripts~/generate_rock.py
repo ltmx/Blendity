@@ -1,5 +1,6 @@
 import bpy
 import sys
+from os import environ
 
 sys.path.insert(0, './py_scripts~')
 from import_export import export_scene
@@ -19,7 +20,8 @@ bpy.ops.mesh.add_mesh_rock(preset_values=str(preset),
                            scale_Z=(y, y),
                            display_detail=get_int('Mesh Density'),
                            user_seed=get_int('seed'),
-                           use_random_seed=False)
+                           use_random_seed=False,
+                           num_of_rocks=get_int('Number of Rocks'))
 
 if get_bool('Smooth'):
   bpy.ops.object.modifier_add(type='SMOOTH')
@@ -28,5 +30,18 @@ if get_bool('Smooth'):
 
 bpy.ops.object.convert(target='MESH')
 bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+dir = '.'.join(environ.get('output').split('.')[:-1])
+print(dir)
+selected = bpy.context.selected_objects
+for index, obj in enumerate(selected):
+  bpy.ops.object.select_all(action='DESELECT')
+  obj.select_set(True)
 
-export_scene()
+  bpy.ops.object.editmode_toggle()
+  bpy.ops.uv.cube_project()
+
+  bpy.ops.object.editmode_toggle()
+
+  bpy.context.view_layer.objects.active = obj
+  export_scene(file_path=dir + get_str('seed') + "-" + str(index) + ".fbx",
+               use_selection=True)

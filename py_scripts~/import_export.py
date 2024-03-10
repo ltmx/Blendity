@@ -15,20 +15,23 @@ def import_scene():
     import_scene.gltf(filepath=inputPath)
 
 
-def export_scene(save_blend=False):
-  outputPath = environ.get('output')
+def export_scene(save_blend=False, file_path=None, use_selection=False):
+  outputPath = environ.get('output') if file_path == None else file_path
   directory = '\\'.join(outputPath.split('\\')[:-1])
   if not path.isdir(directory):
     makedirs(directory)
 
   export_scene = bpy.ops.export_scene
   if outputPath.endswith("fbx"):
-    export_scene.fbx(filepath=outputPath, path_mode='COPY', embed_textures=True)
+    export_scene.fbx(filepath=outputPath,
+                     path_mode='COPY',
+                     embed_textures=True,
+                     use_selection=use_selection)
   elif outputPath.endswith("obj"):
-    export_scene.obj(filepath=outputPath)
+    export_scene.obj(filepath=outputPath, use_selection=use_selection)
   elif outputPath.endswith("x3d"):
-    export_scene.x3d(filepath=outputPath)
+    export_scene.x3d(filepath=outputPath, use_selection=use_selection)
   elif outputPath.endswith("gltf"):
-    export_scene.gltf(filepath=outputPath)
+    export_scene.gltf(filepath=outputPath, use_selection=use_selection)
   if save_blend:
     bpy.ops.wm.save_as_mainfile(filepath=outputPath + ".blend")
